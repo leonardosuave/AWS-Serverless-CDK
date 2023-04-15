@@ -21,6 +21,7 @@ export class ECommerceApiStack extends cdk.Stack {
         //apigateway.RestApi -> permite validações mais avanádas, como URI, body do request...
         const api = new apigateway.RestApi(this, "ECommerceApi", {
             restApiName: "ECommerceApi", // nome da função que aparece no console da AWS
+            cloudWatchRole: true,
             deployOptions: {
                 accessLogDestination: new apigateway.LogGroupLogDestination(logGroup), //Mostra onde o api gateway deve gerar os logs
                 accessLogFormat: apigateway.AccessLogFormat.jsonWithStandardFields({

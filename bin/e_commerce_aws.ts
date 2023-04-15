@@ -1,21 +1,35 @@
 #!/usr/bin/env node
+//  Arquivo responsavel por ler tudo quando enviado a aws
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { ECommerceAwsStack } from '../lib/e_commerce_aws-stack';
+import { ProductsAppStack } from '../lib/productsApp-stack';
+import { ECommerceApiStack } from '../lib/ecommerceApi-stack';
 
 const app = new cdk.App();
-new ECommerceAwsStack(app, 'ECommerceAwsStack', {
-  /* If you don't specify 'env', this stack will be environment-agnostic.
-   * Account/Region-dependent features and context lookups will not work,
-   * but a single synthesized template can be deployed anywhere. */
 
-  /* Uncomment the next line to specialize this stack for the AWS Account
-   * and Region that are implied by the current CLI configuration. */
-  // env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION },
+//  informação da conta aws pego pelo console
+const env: cdk.Environment = {
+  account: "625465831499",
+  region: "us-east-1"
+}
 
-  /* Uncomment the next line if you know exactly what Account and Region you
-   * want to deploy the stack to. */
-  // env: { account: '123456789012', region: 'us-east-1' },
+//  utilizado para gerenciar os custos na aws
+const tags = {
+  const: "ECommerce",
+  team: 'EstudoAWS'
+}
 
-  /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
-});
+//Stack de produto
+const productsAppStack = new ProductsAppStack(app, "ProductsApp", {
+  tags: tags,
+  env: env
+})
+
+const eCommerceApiStack = new ECommerceApiStack(app, "ECommerceApi", {
+  productsFetchHandler: productsAppStack.productsFetchHandler, // 3° parametro é obrigatório ja que foi definido assim no api gateway
+
+  tags: tags,
+  env: env
+})
+
+eCommerceApiStack.addDependency(productsAppStack) //Significa que o eCommerce depende da criação da stack de produtos, ou seja, produtos será criado primeiro <-- 3° parametro obrigatorio referente ao products -->
