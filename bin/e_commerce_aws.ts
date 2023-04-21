@@ -27,7 +27,7 @@ const productsAppStack = new ProductsAppStack(app, "ProductsApp", {
 
 const eCommerceApiStack = new ECommerceApiStack(app, "ECommerceApi", {
   productsFetchHandler: productsAppStack.productsFetchHandler, // 3° parametro é obrigatório ja que foi definido assim no api gateway
-
+  productsAdminHadler: productsAppStack.productsAdminHandler, // Função lambda, igual a linha acima
   tags: tags,
   env: env
 })

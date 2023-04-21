@@ -8,6 +8,7 @@ import { Construct } from "constructs"
 //  Para não inserir o productsFetchHandler: lambdaNodeJS.NodejsFunction dentro do construtor e ficar algo repetitivo com outras stacks, cria-se uma interface que extends o cdk.StackProps e de dentro do construtor da classe torna-se obrigatório o props e referencia como esta interface criada
 interface ECommerceApiStackProps extends cdk.StackProps {
     productsFetchHandler: lambdaNodeJS.NodejsFunction
+    productsAdminHadler: lambdaNodeJS.NodejsFunction
 }
 
 export class ECommerceApiStack extends cdk.Stack {
@@ -41,6 +42,7 @@ export class ECommerceApiStack extends cdk.Stack {
 
         //Integração do API gateway com a função lambda
         const productsFetchIntegration = new apigateway.LambdaIntegration(props.productsFetchHandler)
+        const productsAdminIntegration = new apigateway.LambdaIntegration(props.productsAdminHadler)
 
         //  Forma que o api gateway invoca(integra) a função lambda ->
         //  1° criar recurso que representa o serviço de produtos
@@ -48,6 +50,23 @@ export class ECommerceApiStack extends cdk.Stack {
 
         //  2° criar o método de do recurso produtos
         //  Quando receber uma req /products com verbo GET vai chamar a integration, que invoca a função de stack de produtos, que sera invocado o método handler dentro do arquivo productsFetchFunctions.ts e lá dentro possui verificação para o verbo "GET"
+
+        // <-- Função lambda productsFetch que é responsavel pela leitura -->
+        //  GET /products
         productsResource.addMethod("GET", productsFetchIntegration)
+
+        //  GET /products/{id}
+        const productIdResource = productsResource.addResource("{ID}")  //Adiciona params na URL
+        productIdResource.addMethod("GET", productsFetchIntegration)    //Adiciona recurso de params acima no método GET
+
+        // <-- Função lambda productsAdmin que é responsavel pela escrita -->
+        //  POST /products
+        productsResource.addMethod("POST", productsAdminIntegration)
+
+        //  PUT /products/{id}
+        productIdResource.addMethod("PUT", productsAdminIntegration)
+
+        //  DELETE /products/{id}
+        productIdResource.addMethod("DELETE", productsAdminIntegration)
     }    
 }
