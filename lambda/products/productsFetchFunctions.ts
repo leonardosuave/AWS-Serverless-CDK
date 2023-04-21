@@ -17,12 +17,24 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
         if (method === 'GET') {             //verbo da requisição
             console.log('GET')
 
+            //  Retorno após acessar a rota
             return {
                 statusCode: 200,
                 body: JSON.stringify({
-                    message: "GET products - OK"
+                    message: "GET /products - OK"
                 })
             }
+        }
+    } else if (event.resource === '/products/{id}') {
+        const productId = event.pathParameters!.id as String    //Significa que o parametro pode ser nulo(!) ou id
+        console.log(`GET /products/${productId}`)
+
+        //  Retorno após acessar a rota
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                message: `GET /products/${productId} - OK`
+            })
         }
     }
 
