@@ -25,7 +25,7 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
                 })
             }
         }
-    } else if (event.resource === '/products/{id}') {
+    } else if (event.resource === "/products/{id}") {
         const productId = event.pathParameters!.id as String    //Significa que o parametro pode ser nulo(!) ou id
         console.log(`GET /products/${productId}`)
 

@@ -56,7 +56,7 @@ export class ECommerceApiStack extends cdk.Stack {
         productsResource.addMethod("GET", productsFetchIntegration)
 
         //  GET /products/{id}
-        const productIdResource = productsResource.addResource("{ID}")  //Adiciona params na URL
+        const productIdResource = productsResource.addResource("{id}")  //Adiciona params na URL
         productIdResource.addMethod("GET", productsFetchIntegration)    //Adiciona recurso de params acima no método GET
 
         // <-- Função lambda productsAdmin que é responsavel pela escrita -->

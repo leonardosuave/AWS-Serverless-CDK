@@ -12,9 +12,8 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
     //cloud watch
     console.log(`API Gateway RequestId: ${apiRequestId} - Lambda Request: ${lambdaRequestId}`)
 
-    const method = event.httpMethod
     if (event.resource === "/products") {
-        if (method === 'POST') {    //Não é necessário ja que nessa função existe apenas POST para /products
+        if (event.httpMethod === 'POST') {    //Não é necessário ja que nessa função existe apenas POST para /products
             console.log('POST /products')
 
             //  Retorno após acessar a rota
@@ -25,9 +24,9 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
                 })
             }
         }
-    } else if (event.resource === '/products/{id}') {
+    } else if (event.resource === "/products/{id}") {
         const productId = event.pathParameters!.id as String    //Pode ser nulo ou não (!.)
-        if (method === 'PUT') {
+        if (event.httpMethod === 'PUT') {
             console.log(`PUT /products/${productId}`)
 
             return {
@@ -36,7 +35,7 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
                     message: `PUT /products/${productId}`
                 })
             }
-        } else if (method === 'DELETE') {
+        } else if (event.httpMethod === 'DELETE') {
             console.log(`DELETE /products/${productId}`)
 
             return {
