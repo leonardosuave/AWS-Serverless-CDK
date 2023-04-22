@@ -3,6 +3,7 @@ import * as lambdaNodeJS from "aws-cdk-lib/aws-lambda-nodejs"
 import * as cdk from "aws-cdk-lib"
 import { Construct } from "constructs"
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb"
+import * as ssm from "aws-cdk-lib/aws-ssm"
 
 export class ProductsAppStack extends cdk.Stack {
     //scope: todo o projeto do cdk (app)
@@ -34,6 +35,10 @@ export class ProductsAppStack extends cdk.Stack {
             writeCapacity: 1    //  mesma coisa que readCapacity
         })
 
+        //  <-- Products layer -->
+        const productsLayerArn = ssm.StringParameter.valueForStringParameter(this, "ProductsLayerVersionArn")               //  Resgata a versão do layer armazenado no parametro
+        const productsLayer = lambda.LayerVersion.fromLayerVersionArn(this, "ProductsLayerVersionArn", productsLayerArn)    //  Onde a função vai buscar trecho de codigo do layer resgatado acima
+
         this.productsFetchHandler = new lambdaNodeJS.NodejsFunction(this, "ProductsFetchFunction", {
             functionName: "ProductsFetchFunction", // nome da função que aparece no console da AWS
             entry: "lambda/products/productsFetchFunctions.ts",
@@ -45,8 +50,9 @@ export class ProductsAppStack extends cdk.Stack {
                 sourceMap: false // desliga a geração de mapas pra debugs, ficando menor o arquivo
             },
             environment: {
-                PRODUCTS_DDB: this.productsDbd.tableName // captura o nome da tabela que a funcao acessa
-            }
+                PRODUCTS_DDB: this.productsDbd.tableName, // captura o nome da tabela que a funcao acessa
+            },
+            layers: [productsLayer] //  A função pode buscar código no layer especificado
         })
         this.productsDbd.grantReadData(this.productsFetchHandler) //Limita acesso apenas de leitura da tabela products pela função fetch
 
@@ -62,7 +68,8 @@ export class ProductsAppStack extends cdk.Stack {
             },
             environment: {
                 PRODUCTS_DDB: this.productsDbd.tableName // captura o nome da tabela que a funcao acessa
-            }
+            },
+            layers: [productsLayer] //  A função pode buscar código no layer especificado
         })
         this.productsDbd.grantWriteData(this.productsAdminHandler)  //Limita acesso de escrita na tabela products pela função admin
     }

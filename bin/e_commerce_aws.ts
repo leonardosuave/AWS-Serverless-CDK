@@ -4,6 +4,7 @@ import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { ProductsAppStack } from '../lib/productsApp-stack';
 import { ECommerceApiStack } from '../lib/ecommerceApi-stack';
+import { productsAppLayerStack } from "../lib/productsAppLayers-stack";
 
 const app = new cdk.App();
 
@@ -19,11 +20,18 @@ const tags = {
   team: 'EstudoAWS'
 }
 
+//Layer de stack de produto
+const prooductsAppLayerStack = new ProductsAppStack(app, "ProductsAppLayers", {
+  tags: tags,
+  env: env
+})
+
 //Stack de produto
 const productsAppStack = new ProductsAppStack(app, "ProductsApp", {
   tags: tags,
   env: env
 })
+productsAppStack.addDependency(productsAppLayerStack) //  productsAppStack não será executado antes de productsAppLayerStack
 
 const eCommerceApiStack = new ECommerceApiStack(app, "ECommerceApi", {
   productsFetchHandler: productsAppStack.productsFetchHandler, // 3° parametro é obrigatório ja que foi definido assim no api gateway
