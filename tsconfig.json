@@ -21,7 +21,13 @@
     "strictPropertyInitialization": false,
     "typeRoots": [
       "./node_modules/@types"
-    ]
+    ],
+    "baseUrl": "./",
+    "paths": {  //  Forma de importar o layer
+      "/opt/nodejs/productsLayer":[
+        "lambda/products/layers/productsLayer/nodejs/productRepository"
+      ]
+    }
   },
   "exclude": [
     "node_modules",
