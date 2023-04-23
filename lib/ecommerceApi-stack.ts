@@ -21,20 +21,20 @@ export class ECommerceApiStack extends cdk.Stack {
 
         //apigateway.RestApi -> permite validações mais avanádas, como URI, body do request...
         const api = new apigateway.RestApi(this, "ECommerceApi", {
-            restApiName: "ECommerceApi", // nome da função que aparece no console da AWS
+            restApiName: "ECommerceApi",                                                //  Nome da função que aparece no console da AWS
             cloudWatchRole: true,
             deployOptions: {
-                accessLogDestination: new apigateway.LogGroupLogDestination(logGroup), //Mostra onde o api gateway deve gerar os logs
+                accessLogDestination: new apigateway.LogGroupLogDestination(logGroup), //   Mostra onde o api gateway deve gerar os logs
                 accessLogFormat: apigateway.AccessLogFormat.jsonWithStandardFields({
                     httpMethod: true,
-                    ip: true, //Não adequado, informação de ip
+                    ip: true,                                                           //  Não adequado, informação de ip
                     protocol: true,
                     requestTime: true,
                     resourcePath: true,
                     responseLength: true,
                     status: true,
                     caller: true,
-                    user: true //Não adequado, informação do usuário
+                    user: true                                                          //  Não adequado, informação do usuário
                 })
             }
 
@@ -46,7 +46,7 @@ export class ECommerceApiStack extends cdk.Stack {
 
         //  Forma que o api gateway invoca(integra) a função lambda ->
         //  1° criar recurso que representa o serviço de produtos
-        const productsResource = api.root.addResource("products") // root contem o "/"
+        const productsResource = api.root.addResource("products")   // root contem o "/"
 
         //  2° criar o método de do recurso produtos
         //  Quando receber uma req /products com verbo GET vai chamar a integration, que invoca a função de stack de produtos, que sera invocado o método handler dentro do arquivo productsFetchFunctions.ts e lá dentro possui verificação para o verbo "GET"
@@ -56,8 +56,8 @@ export class ECommerceApiStack extends cdk.Stack {
         productsResource.addMethod("GET", productsFetchIntegration)
 
         //  GET /products/{id}
-        const productIdResource = productsResource.addResource("{id}")  //Adiciona params na URL
-        productIdResource.addMethod("GET", productsFetchIntegration)    //Adiciona recurso de params acima no método GET
+        const productIdResource = productsResource.addResource("{id}")          //  Adiciona params na URL
+        productIdResource.addMethod("GET", productsFetchIntegration)            //  Adiciona recurso de params acima no método GET
 
         // <-- Função lambda productsAdmin que é responsavel pela escrita -->
         //  POST /products
