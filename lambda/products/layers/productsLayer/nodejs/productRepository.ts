@@ -7,7 +7,8 @@ export interface Product {
     productName: string;
     code: string;
     price: number;
-    model: string
+    model: string;
+    productUrl: string;
 }
 
 export class ProductRepository {
@@ -42,7 +43,7 @@ export class ProductRepository {
 
     async create(product : Product): Promise<Product> {
        if (!product.id) product.id = uuid();
-       this.ddbClient.put({
+       await this.ddbClient.put({
             TableName: this.productsDdb,
             Item: product
        }).promise()
@@ -73,12 +74,13 @@ export class ProductRepository {
             },
             ConditionExpression: 'attribute_exists(id)',
             ReturnValues: 'UPDATED_NEW',    //Vai retornar o registro atualizado na posição de data.Attributes
-            UpdateExpression: "Set productName = :n, code = :c, price = :p, model = :m",
+            UpdateExpression: "Set productName = :n, code = :c, price = :p, model = :m, productUrl = :u",
             ExpressionAttributeValues: {
                 ":n": product.productName,
                 ":c": product.code,
                 ":p": product.price,
-                ":m": product.model
+                ":m": product.model,
+                ":u": product.productUrl,
             }
         }).promise()
 
